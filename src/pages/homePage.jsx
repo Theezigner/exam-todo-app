@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLoaderData, Link } from "@tanstack/react-router";
 import { homeRoute } from "../routes/home.route";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../utils/axios";
 import { CreateTodoModal } from "../components/createTodoModal";
 import { EditTodoModal } from "../components/editTodoModal";
@@ -14,10 +14,15 @@ export function HomePage() {
   const todosPerPage = 10;
   const queryClient = useQueryClient();
 
+  // Get loader data and fallback to it via useQuery
   const { todos: initialTodos } = useLoaderData({ from: homeRoute.id });
-  const [todos, setTodos] = useState(initialTodos || []);
+  const { data: todos = [] } = useQuery({
+    queryKey: ["todos"],
+    queryFn: async () => initialTodos,
+    initialData: initialTodos,
+  });
 
-  const filteredData = todos.filter(todo =>
+  const filteredData = todos.filter((todo) =>
     todo.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -26,16 +31,16 @@ export function HomePage() {
     currentPage * todosPerPage
   );
 
-  const totalPages = Math.ceil(filteredData.length / todosPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / todosPerPage));
 
   const createTodoMutation = useMutation({
     mutationFn: async (newTodo) => {
       const res = await axiosInstance.post("/todos", newTodo);
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (newTodo) => {
       toast.success("Task Added!");
-      queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.setQueryData(["todos"], (old = []) => [newTodo, ...old]);
     },
     onError: () => toast.error("Failed to add task."),
   });
@@ -45,9 +50,11 @@ export function HomePage() {
       const res = await axiosInstance.put(`/todos/${updatedTodo.id}`, updatedTodo);
       return res.data;
     },
-    onSuccess: () => {
+    onSuccess: (updatedTodo) => {
       toast.success("Task updated!");
-      queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.setQueryData(["todos"], (old = []) =>
+        old.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+      );
     },
     onError: () => toast.error("Failed to update task."),
   });
@@ -57,27 +64,43 @@ export function HomePage() {
       await axiosInstance.delete(`/todos/${id}`);
       return id;
     },
-    onSuccess: () => {
+    onSuccess: (id) => {
       toast.success("Task deleted!");
-      queryClient.invalidateQueries({ queryKey: ["todos"] });
+      queryClient.setQueryData(["todos"], (old = []) =>
+        old.filter((todo) => todo.id !== id)
+      );
     },
     onError: () => toast.error("Failed to delete task."),
   });
 
   const handleAdd = (newTodo) => {
-    createTodoMutation.mutate(newTodo);
-    setTodos(prev => [newTodo, ...prev]);
+    createTodoMutation.mutate(newTodo, {
+      onSuccess: () => {
+        queryClient.setQueryData(["todos"], (old = []) => [newTodo, ...old]);
+      }
+    });
   };
 
   const handleUpdate = (updatedTodo) => {
-    updateTodoMutation.mutate(updatedTodo);
-    setTodos(prev => prev.map(todo => todo.id === updatedTodo.id ? updatedTodo : todo));
+    updateTodoMutation.mutate(updatedTodo, {
+      onSuccess: () => {
+        queryClient.setQueryData(["todos"], (old = []) =>
+          old.map(todo => (todo.id === updatedTodo.id ? updatedTodo : todo))
+        );
+      }
+    });
   };
 
   const handleDelete = (id) => {
-    deleteTodoMutation.mutate(id);
-    setTodos(prev => prev.filter(todo => todo.id !== id));
+    deleteTodoMutation.mutate(id, {
+      onSuccess: () => {
+        queryClient.setQueryData(["todos"], (old = []) =>
+          old.filter(todo => todo.id !== id)
+        );
+      }
+    });
   };
+
 
   return (
     <main className="space-y-6 max-w-md mx-auto px-4 py-6">
@@ -97,7 +120,7 @@ export function HomePage() {
       </section>
 
       <section aria-label="Todo list" className="grid gap-4 rounded shadow-md bg-base-100 p-4">
-        {paginatedTodos.map(todo => (
+        {paginatedTodos.map((todo) => (
           <article
             key={todo.id}
             className="border-b border-base-300 pb-3 last:border-b-0"

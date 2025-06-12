@@ -2,15 +2,18 @@ import { createRoute } from "@tanstack/react-router";
 import { rootRoute } from "./root.route";
 import { HomePage } from "../pages/homePage.jsx";
 import { axiosInstance } from "../utils/axios";
-import { db } from "../utils/dexieDB.js"
+import { db } from "../utils/dexieDB.js";
 import { ErrorComponent } from "../components/errorComponent.jsx";
+import { queryClient } from "../utils/queryClient";
 
 export const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: HomePage,
+
   loader: async () => {
     try {
+      // Try to fetch from API
       const res = await axiosInstance.get("/todos");
       const todos = res.data;
 
@@ -18,13 +21,21 @@ export const homeRoute = createRoute({
       await db.todos.clear();
       await db.todos.bulkPut(todos);
 
+      // Cache in React Query for later reuse
+      queryClient.setQueryData(["todos"], todos);
+
       return { todos };
     } catch (error) {
-      // If offline or API fails, load from Dexie
+      // If offline or error, fallback to Dexie
       const offlineTodos = await db.todos.toArray();
+
+      // Also cache offline data
+      queryClient.setQueryData(["todos"], offlineTodos);
+
       return { todos: offlineTodos };
     }
   },
+
   pendingComponent: () => (
     <section
       role="status"
@@ -34,8 +45,6 @@ export const homeRoute = createRoute({
       ⏳ Loading todos...
     </section>
   ),
+
   errorComponent: ErrorComponent,
 });
-
-
-
