@@ -32,7 +32,7 @@ This project is a single-page Todo application developed using React as part of 
 - [UI/UX Design](#uiux-design)
 - [Accessibility](#accessibility)
 - [API Documentation](#api-documentation)
-- [Screenshots](#page-images)
+- [Screenshots](#screenshots)
 - [Known Issues](#known-issues)
 - [Future Improvements](#future-improvements)
 - [License](#license)
