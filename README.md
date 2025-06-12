@@ -19,7 +19,7 @@ This project is a single-page Todo application developed using React as part of 
 ## Live Demo
 
 - **Deployed App**: [Add your Netlify or PipeOps link here]
-- **Source Code**: [Link to your GitHub repository]
+- **Source Code**: (https://github.com/Theezigner/exam-todo-app.git)
 
 ## Table of Contents
 
@@ -39,7 +39,7 @@ This project is a single-page Todo application developed using React as part of 
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/exam-todo-app.git
+   git clone https://github.com/Theezigner/exam-todo-app.git
    cd exam-todo-app
    ```
 
