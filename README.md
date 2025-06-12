@@ -141,15 +141,15 @@ Base API: [`https://jsonplaceholder.typicode.com/todos`](https://jsonplaceholder
 
 ### Homepage
 Displays a paginated list of todos with a search bar.
-![Homepage](./screenshots/homepage.png)
+![Homepage](./src/screenshots/homepage.png)
 
 ### Create Todo Modal
 Form to add a new todo with validation and keyboard accessibility.
-![Create Modal](./screenshots/createTodo.png)
+![Create Modal](./src/screenshots/createTodo.png)
 
 ### Todo Detail Page
 Shows detailed status of a selected task with back navigation.
-![Detail Page](./screenshots/Taskdetails.png)
+![Detail Page](./src/screenshots/Taskdetails.png)
 
 
 
