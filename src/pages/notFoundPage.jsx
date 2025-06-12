@@ -1,6 +1,19 @@
 import { Link } from "@tanstack/react-router";
+import { useHead } from "@unhead/react";
 
 export function NotFoundPage() {
+
+    useHead({
+    title: 'Not Found',
+    meta: [
+      { name: 'description', content: 'Page not found.' },
+    ],
+    link: [
+      { rel: 'icon', href: '/favicon.ico' },
+      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+    ],
+  });
+
   return (
     <main className="min-h-screen px-4 py-10 text-center space-y-4">
       <section role="alert" aria-labelledby="not-found-title">

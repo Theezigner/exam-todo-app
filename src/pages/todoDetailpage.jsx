@@ -1,8 +1,20 @@
 import { useLoaderData, Link } from "@tanstack/react-router";
 import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { useHead } from "@unhead/react";
 
 export function TodoDetailPage() {
   const { todo } = useLoaderData({ from: "/todo/$id" });
+
+  useHead({
+    title: 'Task Details',
+    meta: [
+      { name: 'description', content: 'Task description.' },
+    ],
+    link: [
+      { rel: 'icon', href: '/favicon.ico' },
+      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+    ],
+  });
 
   return (
     <main className="max-w-sm mx-auto p-4 space-y-4">

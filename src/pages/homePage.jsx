@@ -7,6 +7,7 @@ import { CreateTodoModal } from "../components/createTodoModal";
 import { EditTodoModal } from "../components/editTodoModal";
 import { DeleteTodoModal } from "../components/deleteTodoModal";
 import { toast } from "react-hot-toast";
+import { useHead } from '@unhead/react';
 
 export function HomePage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,11 +15,10 @@ export function HomePage() {
   const todosPerPage = 10;
   const queryClient = useQueryClient();
 
-  // Get loader data and fallback to it via useQuery
   const { todos: initialTodos } = useLoaderData({ from: homeRoute.id });
   const { data: todos = [] } = useQuery({
     queryKey: ["todos"],
-    queryFn: async () => initialTodos,
+    queryFn: async () => initialTodos, // Loader is already pre-fetched
     initialData: initialTodos,
   });
 
@@ -74,38 +74,32 @@ export function HomePage() {
   });
 
   const handleAdd = (newTodo) => {
-    createTodoMutation.mutate(newTodo, {
-      onSuccess: () => {
-        queryClient.setQueryData(["todos"], (old = []) => [newTodo, ...old]);
-      }
-    });
+    createTodoMutation.mutate(newTodo);
   };
 
   const handleUpdate = (updatedTodo) => {
-    updateTodoMutation.mutate(updatedTodo, {
-      onSuccess: () => {
-        queryClient.setQueryData(["todos"], (old = []) =>
-          old.map(todo => (todo.id === updatedTodo.id ? updatedTodo : todo))
-        );
-      }
-    });
+    updateTodoMutation.mutate(updatedTodo);
   };
 
   const handleDelete = (id) => {
-    deleteTodoMutation.mutate(id, {
-      onSuccess: () => {
-        queryClient.setQueryData(["todos"], (old = []) =>
-          old.filter(todo => todo.id !== id)
-        );
-      }
-    });
+    deleteTodoMutation.mutate(id);
   };
 
+  useHead({
+    title: 'Todo App-Home',
+    meta: [
+      { name: 'description', content: 'A simple and accessible todo application.' },
+    ],
+    link: [
+      { rel: 'icon', href: '/favicon.ico' },
+      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+    ],
+  });
 
   return (
     <main className="space-y-6 max-w-l mx-auto px-4 py-6">
       <section className="flex justify-center">
-        <div className="form-control w-full max-w-md" aria-label="Search todos">
+        <form className="form-control w-full max-w-md" aria-label="Search todos">
           <input
             type="text"
             className="input input-bordered input-sm w-full"
@@ -114,9 +108,8 @@ export function HomePage() {
             onChange={(e) => setSearchTerm(e.target.value)}
             aria-label="Search todos by title"
           />
-        </div>
+        </form>
       </section>
-
 
       <section className="flex justify-end">
         <CreateTodoModal onAdd={handleAdd} />
@@ -187,3 +180,4 @@ export function HomePage() {
     </main>
   );
 }
+
