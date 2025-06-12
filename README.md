@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a single-page Todo application developed using React as part of the AltSchool Africa Frontend Engineering Second Semester Examination. It showcases the application of modern frontend development practices, with a focus on usability, accessibility, and architectural clarity.
+This project is a single-page Todo application developed using React as part of the AltSchool Africa Frontend Engineering Second Semester Examination. It showcases the application of modern frontend development practices, with a focus on usability, accessibility, performance, and architectural clarity.
 
 ### Key Highlights:
 - Built with React 19 functional components and hooks
@@ -11,10 +11,11 @@ This project is a single-page Todo application developed using React as part of 
 - Optimistic UI updates for a seamless user experience
 - Utility-first styling via Tailwind CSS and DaisyUI
 - Font customization using "Quicksand" via Google Fonts
-- Focus management in modals (keyboard navigation, ESC to close)
+- SEO enhancements using `@unhead/react`
+- Focus management in modals (keyboard navigation, ESC to close, tabIndex control)
 - React Icons for visual cues (e.g., plus, trash, edit, status indicators)
-- Persistent query cache via localStorage with optional Dexie.js support
-- Designed with responsiveness, accessibility, and modularity in mind
+- Persistent query cache via localStorage (with Dexie.js as optional offline fallback)
+- Accessible and responsive design system with semantic HTML and ARIA roles
 
 ## Live Demo
 
@@ -31,6 +32,7 @@ This project is a single-page Todo application developed using React as part of 
 - [UI/UX Design](#uiux-design)
 - [Accessibility](#accessibility)
 - [API Documentation](#api-documentation)
+- [Screenshots](#page-images)
 - [Known Issues](#known-issues)
 - [Future Improvements](#future-improvements)
 - [License](#license)
@@ -66,58 +68,60 @@ This project is a single-page Todo application developed using React as part of 
 - **React 19**
 - **Vite** (build tool)
 - **Tailwind CSS** + **DaisyUI** (component styling)
-- **TanStack Router** (nested routing, route loaders)
-- **React Query** (data fetching, caching, persistence)
+- **TanStack Router** (nested routing, route loaders, pending & error components)
+- **React Query** (data fetching, caching, persistence with fallback)
 - **Axios** (API requests)
-- **LocalStorage** (offline caching)
+- **Dexie.js** (IndexedDB support for offline caching)
 - **React Hook Form** (form validation)
 - **React Icons**
-- **React Hot Toast**(notifications)
+- **React Hot Toast** (notifications)
+- **@unhead/react** (SEO support and dynamic metadata)
+- **LocalStorage** (query persistence)
 
 ## Architecture
 
 ```plaintext
 src/
-├── components/         # Reusable modal components, theme toggle, error display
-├── layouts/            # App layout and outlet container
-├── pages/              # Home and Detail views
-├── routes/             # Route definitions and loaders
-├── utils/              # Axios config, Dexie or localStorage utilities
-├── App.jsx             # Main app container with persistence
-├── main.jsx            # Entry point rendering the app
+├── components/         # Reusable modals, alerts, and buttons
+├── layouts/            # App layout with theme toggle and <Outlet />
+├── pages/              # Home and TodoDetailPage
+├── routes/             # Route declarations with loaders and error states
+├── utils/              # Axios config, Dexie config, queryClient setup
+├── screenshots/        # Page images 
+├── App.jsx             # Root component and provider wrappers
+├── main.jsx            # Application bootstrap entry
 ```
 
 ## Features
 
-- Paginated list of todos with real-time search filtering
-- Nested detail page with full todo data
-- Add, update, and delete functionality using modals
-- Optimistic updates via React Query for smooth UX
-- Persistent query cache with `localStorage`
-- Focus management: auto-focus, tabIndex, and ESC key support in modals
-- Semantic HTML structure with accessible roles and landmarks
-- Graceful error boundaries and skeleton loaders
-- Mobile-first responsive layout
-- Theme toggle for light/dark mode
+- Fetch todos from JSONPlaceholder API
+- Paginated and searchable list of todos
+- View full task details via nested routes
+- Add, edit, and delete todos using modal dialogs
+- Optimistic UI for smooth interactions
+- Data persistence using React Query + LocalStorage
+- Optional offline support with Dexie.js
+- SEO metadata via `@unhead/react`
+- Responsive and accessible UI
+- ARIA support, role-based markup, and semantic HTML
 
 ## UI/UX Design
 
-- Centralized layout using `max-w-md` containers
-- Spacing and alignment handled with Tailwind utilities
-- Buttons styled with attention to hover/focus/active states
-- Modals optimized for clarity and keyboard use
-- Visual feedback via spinners, skeletons, and toast notifications
-- Friendly, modern font (Quicksand) imported via HTML <link> in index.html
+- Layout uses `max-w-md` container for readability
+- Consistent spacing and alignment with Tailwind utilities
+- Visually distinct button states and focus indicators
+- Accessible modals with keyboard interaction support
+- Skeleton loaders and toasts improve perceived performance
+- Modern and friendly font ("Quicksand") linked via HTML in `index.html`
 
 ## Accessibility
 
-- Semantic HTML throughout (`<main>`, `<nav>`, `<section>`, `<article>`)
-- ARIA roles applied to modals and dynamic components
-- Escape key support for modal dismissal
-- Screen reader-friendly alerts using `aria-live` regions
-- Focus management using `tabIndex`, `autoFocus`, and keyboard event handling
-- Color contrast meets WCAG AA standards
-- No loss of keyboard access across components
+- Semantic HTML (`<main>`, `<section>`, `<article>`, etc.)
+- `aria-live`, `aria-label`, `aria-modal` used in dynamic components
+- Modals support `ESC` to close, `autoFocus`, and `tabIndex`
+- Buttons include `aria-label` for clarity
+- Color contrast tested for WCAG compliance
+- Screen reader-friendly alert and toast messages
 
 ## API Documentation
 
@@ -131,21 +135,41 @@ Base API: [`https://jsonplaceholder.typicode.com/todos`](https://jsonplaceholder
 | PUT    | `/todos/:id`   | Update existing todo    |
 | DELETE | `/todos/:id`   | Delete a todo           |
 
-> Note: Since JSONPlaceholder is a mock API, CRUD operations do not persist after refresh. The app uses local state and optimistic UI to simulate persistence.
+> **Note**: Since JSONPlaceholder is a mock API, changes are not persisted after a refresh. Local state, React Query, and Dexie.js are used to simulate persistence.
+
+## Screenshots
+
+### Homepage
+Displays a paginated list of todos with a search bar.
+![Homepage](./screenshots/homepage.jpeg)
+
+### Create Todo Modal
+Form to add a new todo with validation and keyboard accessibility.
+![Create Modal](./screenshots/createTodo.jpeg)
+
+### Todo Detail Page
+Shows detailed status of a selected task with back navigation.
+![Detail Page](./screenshots/Taskdetails.jpeg)
+
+
+
 
 ## Known Issues
 
-- JSONPlaceholder does not support persistent changes
-- No authentication or user-specific data
-- Focus is not programmatically trapped within modals (tab escape is possible)
+- Created/edited todos may not appear in detail view unless fallback is implemented
+- JSONPlaceholder does not support true persistence, affecting realistic syncing
+- Dexie.js was set up but full offline mutation sync is not implemented
+- SEO improvements are in place, but site performance scoring may vary due to demo API latency
+- Modals are accessible but not fully focus-trapped with libraries like `focus-trap-react`
 
 ## Future Improvements
 
-- Sync offline actions with the server when back online (Dexie.js)
-- Filter and sort todos by status or creation date
-- Integrate a real backend for persistent storage
-- Implement authentication and multi-user support
-- Add accessibility enhancements using `focus-trap` or `aria-describedby`
+- Enable offline sync with background queue (Dexie + mutation sync)
+- Replace mock API with real backend (e.g., Supabase or Express server)
+- Add authentication and user-specific todos
+- Add status filters (completed/incomplete)
+- Full test coverage and CI/CD integration
+- Add focus-trap to modals for better accessibility
 
 ## License
 
