@@ -129,11 +129,11 @@ Base API: [`https://jsonplaceholder.typicode.com/todos`](https://jsonplaceholder
 
 | Method | Endpoint       | Description             |
 |--------|----------------|-------------------------|
-| GET    | `/todo`       | Retrieve all todos      |
-| GET    | `/todo/:id`   | Retrieve single todo    |
-| POST   | `/todo`       | Create a new todo       |
-| PUT    | `/todo/:id`   | Update existing todo    |
-| DELETE | `/todo/:id`   | Delete a todo           |
+| GET    | `/todos`       | Retrieve all todos      |
+| GET    | `/todos/:id`   | Retrieve single todo    |
+| POST   | `/todos`       | Create a new todo       |
+| PUT    | `/todos/:id`   | Update existing todo    |
+| DELETE | `/todos/:id`   | Delete a todo           |
 
 > **Note**: Since JSONPlaceholder is a mock API, changes are not persisted after a refresh. Local state, React Query, and Dexie.js are used to simulate persistence.
 
