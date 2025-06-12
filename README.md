@@ -129,11 +129,11 @@ Base API: [`https://jsonplaceholder.typicode.com/todos`](https://jsonplaceholder
 
 | Method | Endpoint       | Description             |
 |--------|----------------|-------------------------|
-| GET    | `/todos`       | Retrieve all todos      |
-| GET    | `/todos/:id`   | Retrieve single todo    |
-| POST   | `/todos`       | Create a new todo       |
-| PUT    | `/todos/:id`   | Update existing todo    |
-| DELETE | `/todos/:id`   | Delete a todo           |
+| GET    | `/todo`       | Retrieve all todos      |
+| GET    | `/todo/:id`   | Retrieve single todo    |
+| POST   | `/todo`       | Create a new todo       |
+| PUT    | `/todo/:id`   | Update existing todo    |
+| DELETE | `/todo/:id`   | Delete a todo           |
 
 > **Note**: Since JSONPlaceholder is a mock API, changes are not persisted after a refresh. Local state, React Query, and Dexie.js are used to simulate persistence.
 
@@ -161,6 +161,7 @@ Shows detailed status of a selected task with back navigation.
 - Dexie.js was set up but full offline mutation sync is not implemented
 - SEO improvements are in place, but site performance scoring may vary due to demo API latency
 - Modals are accessible but not fully focus-trapped with libraries like `focus-trap-react`
+- New learnings had to be done in the process to understand some part of the project
 
 ## Future Improvements
 
@@ -170,6 +171,7 @@ Shows detailed status of a selected task with back navigation.
 - Add status filters (completed/incomplete)
 - Full test coverage and CI/CD integration
 - Add focus-trap to modals for better accessibility
+- Ensure edits stays on reload
 
 ## License
 
