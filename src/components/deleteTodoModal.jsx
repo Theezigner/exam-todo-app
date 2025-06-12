@@ -20,7 +20,7 @@ export function DeleteTodoModal({ todo, onDelete }) {
   return (
     <>
       <button
-        className="btn btn-xs py-0 hover:text-red-600 border-none bg-white"
+        className="btn btn-xs py-0 hover:text-red-600 border-none"
         aria-label="Delete Task"
         onClick={() => setIsOpen(true)}
       >
