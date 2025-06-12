@@ -18,8 +18,8 @@ This project is a single-page Todo application developed using React as part of 
 
 ## Live Demo
 
-- **Deployed App**: [Add your Netlify or PipeOps link here]
-- **Source Code**: (https://github.com/Theezigner/exam-todo-app.git)
+- **Deployed App**: https://exam-todo-app-xi.vercel.app/
+- **Source Code**: https://github.com/Theezigner/exam-todo-app.git
 
 ## Table of Contents
 
