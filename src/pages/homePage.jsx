@@ -103,17 +103,20 @@ export function HomePage() {
 
 
   return (
-    <main className="space-y-6 max-w-md mx-auto px-4 py-6">
-      <section aria-label="Search todos" className="form-control">
-        <input
-          type="text"
-          className="input input-bordered input-sm w-full"
-          placeholder="Search todos..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          aria-label="Search todos by title"
-        />
+    <main className="space-y-6 max-w-l mx-auto px-4 py-6">
+      <section className="flex justify-center">
+        <div className="form-control w-full max-w-md" aria-label="Search todos">
+          <input
+            type="text"
+            className="input input-bordered input-sm w-full"
+            placeholder="Search todos..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            aria-label="Search todos by title"
+          />
+        </div>
       </section>
+
 
       <section className="flex justify-end">
         <CreateTodoModal onAdd={handleAdd} />
