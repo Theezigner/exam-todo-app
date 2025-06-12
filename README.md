@@ -151,6 +151,10 @@ Form to add a new todo with validation and keyboard accessibility.
 Shows detailed status of a selected task with back navigation.
 ![Detail Page](./src/screenshots/Taskdetails.png)
 
+### Homepage Dark Mode
+Displays a paginated list of todos with a search bar in dark mode.
+![Homepage](./src/screenshots/darkMode.png)
+
 
 
 
