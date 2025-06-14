@@ -18,7 +18,7 @@ export function HomePage() {
   const { todos: initialTodos } = useLoaderData({ from: homeRoute.id });
   const { data: todos = [] } = useQuery({
     queryKey: ["todos"],
-    queryFn: async () => initialTodos, // Loader is already pre-fetched
+    queryFn: async () => initialTodos,
     initialData: initialTodos,
   });
 
