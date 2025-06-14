@@ -23,7 +23,7 @@ export function TodoDetailPage() {
           <h2 className="text-xl font-bold">Task Details</h2>
         </header>
 
-        <p><strong>Title:</strong> {todo.title}</p>
+        <p><strong>Title:</strong> {todo.title.charAt(0).toUpperCase() + todo.title.slice(1)}</p>
 
         <p className="flex flex-row gap-2 justify-center">
           <strong>Status:</strong>{" "}
