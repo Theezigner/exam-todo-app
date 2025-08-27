@@ -5,7 +5,7 @@ import { Toaster } from "react-hot-toast";
 import { persistQueryClient } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { queryClient } from "./utils/queryClient";
-import "./App.css";
+import "./App.css";  
 
 const persister = createSyncStoragePersister({
   storage: window.localStorage,

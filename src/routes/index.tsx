@@ -1,4 +1,4 @@
-import { createRouter, RouterProvider } from "@tanstack/react-router";
+import { createRouter } from "@tanstack/react-router";
 import { rootRoute } from "./root.route";
 import { homeRoute } from "./home.route";
 import { todoDetailRoute } from "./todoDetail.route";

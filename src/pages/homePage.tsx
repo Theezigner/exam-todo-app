@@ -7,99 +7,126 @@ import { CreateTodoModal } from "../components/createTodoModal";
 import { EditTodoModal } from "../components/editTodoModal";
 import { DeleteTodoModal } from "../components/deleteTodoModal";
 import { toast } from "react-hot-toast";
-import { useHead } from '@unhead/react';
+import { useHead } from "@unhead/react";
+import type { Todo } from "../components/editTodoModal";
+
+type HomeLoaderData = { todos: Todo[] };
 
 export function HomePage() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const todosPerPage = 10;
   const queryClient = useQueryClient();
 
-  const { todos: initialTodos } = useLoaderData({ from: homeRoute.id });
-  const { data: todos = [] } = useQuery({
+  // Loader data
+  const { todos: initialTodos } = useLoaderData({
+    from: homeRoute.id,
+  }) as HomeLoaderData;
+
+  // Query cache
+  const { data: todos = [] } = useQuery<Todo[]>({
     queryKey: ["todos"],
     queryFn: async () => initialTodos,
     initialData: initialTodos,
   });
 
+  // Search + pagination
   const filteredData = todos.filter((todo) =>
     todo.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
   const paginatedTodos = filteredData.slice(
     (currentPage - 1) * todosPerPage,
     currentPage * todosPerPage
   );
-
   const totalPages = Math.max(1, Math.ceil(filteredData.length / todosPerPage));
 
-  const createTodoMutation = useMutation({
+  // Create
+  const createTodoMutation = useMutation<Todo, Error, Omit<Todo, "id">>({
     mutationFn: async (newTodo) => {
       const res = await axiosInstance.post("/todos", newTodo);
-      return res.data;
+      return res.data as Todo;
     },
-    onSuccess: (newTodo) => {
-      toast.success("Task Added!");
-      queryClient.setQueryData(["todos"], (old = []) => [newTodo, ...old]);
+    onSuccess: (serverTodo, variables) => {
+      const next = serverTodo ?? ({ id: Date.now(), ...variables } as Todo);
+      toast.success("Task added!");
+      queryClient.setQueryData<Todo[]>(["todos"], (old = []) => [next, ...old]);
     },
     onError: () => toast.error("Failed to add task."),
   });
 
-  const updateTodoMutation = useMutation({
+  // Update
+  const updateTodoMutation = useMutation<Todo | void, Error, Todo>({
     mutationFn: async (updatedTodo) => {
-      const res = await axiosInstance.put(`/todos/${updatedTodo.id}`, updatedTodo);
-      return res.data;
+      const res = await axiosInstance.put(
+        `/todos/${updatedTodo.id}`,
+        updatedTodo
+      );
+      return res.data as Todo | void; // some backends return nothing
     },
-    onSuccess: (updatedTodo) => {
+    onSuccess: (serverTodo, variables) => {
+      const next = (serverTodo as Todo) ?? variables;
       toast.success("Task updated!");
-      queryClient.setQueryData(["todos"], (old = []) =>
-        old.map((todo) => (todo.id === updatedTodo.id ? updatedTodo : todo))
+      queryClient.setQueryData<Todo[]>(["todos"], (old = []) =>
+        old.map((t) => (String(t.id) === String(next.id) ? next : t))
       );
     },
     onError: () => toast.error("Failed to update task."),
   });
 
-  const deleteTodoMutation = useMutation({
+  // Delete
+  const deleteTodoMutation = useMutation<
+    string | number,
+    Error,
+    string | number
+  >({
     mutationFn: async (id) => {
       await axiosInstance.delete(`/todos/${id}`);
       return id;
     },
     onSuccess: (id) => {
       toast.success("Task deleted!");
-      queryClient.setQueryData(["todos"], (old = []) =>
-        old.filter((todo) => todo.id !== id)
+      queryClient.setQueryData<Todo[]>(["todos"], (old = []) =>
+        old.filter((t) => String(t.id) !== String(id))
       );
     },
     onError: () => toast.error("Failed to delete task."),
   });
 
-  const handleAdd = (newTodo) => {
+  // Handlers
+  const handleAdd = (newTodo: Omit<Todo, "id">) => {
     createTodoMutation.mutate(newTodo);
   };
 
-  const handleUpdate = (updatedTodo) => {
+  const handleUpdate = (updatedTodo: Todo) => {
     updateTodoMutation.mutate(updatedTodo);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = (id: string | number) => {
     deleteTodoMutation.mutate(id);
   };
 
+  // Head
   useHead({
-    title: 'Todo App-Home',
+    title: "Todo App-Home",
     meta: [
-      { name: 'description', content: 'A simple and accessible todo application.' },
+      {
+        name: "description",
+        content: "A simple and accessible todo application.",
+      },
     ],
     link: [
-      { rel: 'icon', href: '/favicon.ico' },
-      { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' },
+      { rel: "icon", href: "/favicon.ico" },
+      { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
     ],
   });
 
   return (
-    <main className="space-y-6 max-w-l mx-auto px-4 py-6">
+    <main className="space-y-6 max-w-lg mx-auto px-4 py-6">
       <section className="flex justify-center">
-        <form className="form-control w-full max-w-md" aria-label="Search todos">
+        <form
+          className="form-control w-full max-w-md"
+          aria-label="Search todos"
+        >
           <input
             type="text"
             className="input input-bordered input-sm w-full"
@@ -115,7 +142,10 @@ export function HomePage() {
         <CreateTodoModal onAdd={handleAdd} />
       </section>
 
-      <section aria-label="Todo list" className="grid gap-4 rounded shadow-md bg-base-100 p-4">
+      <section
+        aria-label="Todo list"
+        className="grid gap-4 rounded shadow-md bg-base-100 p-4"
+      >
         {paginatedTodos.map((todo) => (
           <article
             key={todo.id}
@@ -125,7 +155,7 @@ export function HomePage() {
             <header className="flex items-start gap-2 text-left">
               <h2 className="text-md font-semibold break-words">
                 <Link
-                  to={`/todo/${todo.id}`}
+                  to="/todo/$id"
                   params={{ id: String(todo.id) }}
                   className="link link-hover"
                 >
@@ -170,7 +200,9 @@ export function HomePage() {
 
         <button
           className="btn btn-sm"
-          onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+          onClick={() =>
+            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+          }
           disabled={currentPage === totalPages}
           aria-label="Go to next page"
         >
@@ -180,4 +212,3 @@ export function HomePage() {
     </main>
   );
 }
-

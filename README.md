@@ -2,10 +2,11 @@
 
 ## Overview
 
-This project is a single-page Todo application developed using React as part of the AltSchool Africa Frontend Engineering Second Semester Examination. It showcases the application of modern frontend development practices, with a focus on usability, accessibility, performance, and architectural clarity.
+This project is a single-page Todo application developed using React as part of the AltSchool Africa Frontend Engineering Second Semester Examination. It showcases the application of modern frontend development practices, with a focus on usability, accessibility, performance, architectural clarity, **and TypeScript-first correctness**.
 
-### Key Highlights:
-- Built with React 19 functional components and hooks
+### Key Highlights
+- Built with **React 19** functional components and hooks
+- **TypeScript (TSX/TS)** across the codebase (strict mode + type-only imports)
 - Route-level data handling with TanStack Router
 - Integrated with REST API endpoints using Axios
 - Optimistic UI updates for a seamless user experience
@@ -16,6 +17,8 @@ This project is a single-page Todo application developed using React as part of 
 - React Icons for visual cues (e.g., plus, trash, edit, status indicators)
 - Persistent query cache via localStorage (with Dexie.js as optional offline fallback)
 - Accessible and responsive design system with semantic HTML and ARIA roles
+
+> **New:** The app was migrated from **.jsx / .js** to **.tsx / .ts**. See **TypeScript Migration Notes** below.
 
 ## Live Demo
 
@@ -28,6 +31,7 @@ This project is a single-page Todo application developed using React as part of 
 - [Scripts](#scripts)
 - [Technology Stack](#technology-stack)
 - [Architecture](#architecture)
+- [TypeScript Migration Notes](#typescript-migration-notes)
 - [Features](#features)
 - [UI/UX Design](#uiux-design)
 - [Accessibility](#accessibility)
@@ -36,6 +40,7 @@ This project is a single-page Todo application developed using React as part of 
 - [Known Issues](#known-issues)
 - [Future Improvements](#future-improvements)
 - [License](#license)
+- [Author](#author)
 
 ## Installation
 
@@ -66,6 +71,7 @@ This project is a single-page Todo application developed using React as part of 
 ## Technology Stack
 
 - **React 19**
+- **TypeScript** (TSX/TS, `strict` + `verbatimModuleSyntax`)
 - **Vite** (build tool)
 - **Tailwind CSS** + **DaisyUI** (component styling)
 - **TanStack Router** (nested routing, route loaders, pending & error components)
@@ -82,15 +88,41 @@ This project is a single-page Todo application developed using React as part of 
 
 ```plaintext
 src/
-├── components/         # Reusable modals, alerts, and buttons
-├── layouts/            # App layout with theme toggle and <Outlet />
-├── pages/              # Home and TodoDetailPage
-├── routes/             # Route declarations with loaders and error states
-├── utils/              # Axios config, Dexie config, queryClient setup
-├── screenshots/        # Page images 
-├── App.jsx             # Root component and provider wrappers
-├── main.jsx            # Application bootstrap entry
+├── components/            # Reusable modals, alerts, and buttons
+│   ├── createTodoModal.tsx
+│   ├── deleteTodoModal.tsx
+│   └── editTodoModal.tsx
+├── layouts/
+│   └── layout.tsx         # App layout with theme toggle and <Outlet />
+├── pages/
+│   ├── homePage.tsx
+│   └── TodoDetailPage.tsx
+├── routes/
+│   ├── root.route.tsx
+│   ├── home.route.tsx
+│   └── todoDetail.route.tsx
+├── utils/
+│   ├── axios.ts
+│   ├── dexieDB.ts         # Typed Dexie Table<Todo, ...>
+│   └── queryClient.ts
+├── screenshots/           # Page images
+├── App.tsx                # Root component and provider wrappers
+├── main.tsx               # Application bootstrap entry
+└── App.css
 ```
+
+## TypeScript Migration Notes
+
+- **File Extensions:** All React components moved from `.jsx` → `.tsx`; utilities from `.js` → `.ts`.
+- **Shared Types:** A canonical `Todo` type lives in `src/utils/dexieDB.ts` and is imported across pages, modals, routes, and loaders to avoid drift.
+- **Dexie Typing:** `db.todos` is typed as `Table<Todo, number>` (or `number | string` if needed), removing `any` casts and aligning with loader keys.
+- **Router Types:**  
+  - `useLoaderData` is used **without** a generic and cast to the loader’s return type (or via `getRouteApi(homeRoute.id)` if preferred).  
+  - `errorComponent` uses TanStack’s `ErrorComponentProps`.
+- **React Query:** Mutations are typed with `<TData, TError, TVariables>`. Cache updates normalize IDs with `String(id)` to handle number/string differences between online/offline data.
+- **Type-Only Imports:** Because `verbatimModuleSyntax` is enabled, types like `Table` are imported with `import type { Table } from "dexie"`.
+- **CSS Imports:** For TS to accept `*.css`, a global declaration is included (e.g., `src/vite-env.d.ts` with `declare module "*.css";`).
+- **Casing Consistency:** All imports match file casing exactly (Windows is case-insensitive but TypeScript is not).
 
 ## Features
 
@@ -140,23 +172,20 @@ Base API: [`https://jsonplaceholder.typicode.com/todos`](https://jsonplaceholder
 ## Screenshots
 
 ### Homepage
-Displays a paginated list of todos with a search bar.
+Displays a paginated list of todos with a search bar.  
 ![Homepage](./src/screenshots/homepage.png)
 
 ### Create Todo Modal
-Form to add a new todo with validation and keyboard accessibility.
+Form to add a new todo with validation and keyboard accessibility.  
 ![Create Modal](./src/screenshots/createTodo.png)
 
 ### Todo Detail Page
-Shows detailed status of a selected task with back navigation.
+Shows detailed status of a selected task with back navigation.  
 ![Detail Page](./src/screenshots/Taskdetails.png)
 
 ### Homepage Dark Mode
-Displays a paginated list of todos with a search bar in dark mode.
+Displays a paginated list of todos with a search bar in dark mode.  
 ![Homepage](./src/screenshots/darkMode.png)
-
-
-
 
 ## Known Issues
 
@@ -186,3 +215,4 @@ This project was submitted as part of the AltSchool Africa Frontend Engineering 
 **Temitayo Adebayo**  
 AltSchool Africa – Frontend Engineering  
 Second Semester, Tinyuka Cohort
+

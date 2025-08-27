@@ -1,40 +1,37 @@
 import { createRoute } from "@tanstack/react-router";
 import { rootRoute } from "./root.route";
-import { HomePage } from "../pages/homePage.jsx";
+import { HomePage } from "../pages/homePage";
 import { axiosInstance } from "../utils/axios";
-import { db } from "../utils/dexieDB.js";
-import { ErrorComponent } from "../components/errorComponent.jsx";
+import { db } from "../utils/dexieDB";
+import { ErrorComponent } from "../components/errorComponent";
 import { queryClient } from "../utils/queryClient";
+import type { Todo } from "../utils/dexieDB"; // ← use the same Todo type as Dexie
+
+export type HomeLoaderData = { todos: Todo[] };
 
 export const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "/",
   component: HomePage,
 
-  loader: async () => {
+  loader: (async (): Promise<HomeLoaderData> => {
     try {
-      // Try to fetch from API
-      const res = await axiosInstance.get("/todos");
+      const res = await axiosInstance.get<Todo[]>("/todos");
       const todos = res.data;
 
-      // Save to Dexie for offline fallback
       await db.todos.clear();
       await db.todos.bulkPut(todos);
 
-      // Cache in React Query for later reuse
-      queryClient.setQueryData(["todos"], todos);
-
+      queryClient.setQueryData<Todo[]>(["todos"], todos);
       return { todos };
     } catch (error) {
-      // If offline or error, fallback to Dexie
-      const offlineTodos = await db.todos.toArray();
+      console.warn("Falling back to offline todos:", error);
+      const offlineTodos = await db.todos.toArray(); // typed as Todo[]
 
-      // Also cache offline data
-      queryClient.setQueryData(["todos"], offlineTodos);
-
+      queryClient.setQueryData<Todo[]>(["todos"], offlineTodos);
       return { todos: offlineTodos };
     }
-  },
+  }) satisfies () => Promise<HomeLoaderData>,
 
   pendingComponent: () => (
     <section

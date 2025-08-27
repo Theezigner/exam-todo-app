@@ -1,6 +1,18 @@
 import { Link } from "@tanstack/react-router";
 
-export function ErrorComponent({ error }) {
+type ErrorComponentProps = {
+  error: unknown;
+};
+
+export function ErrorComponent({ error }: ErrorComponentProps) {
+
+  const message =
+    error instanceof Error
+      ? error.message
+      : typeof error === "string"
+      ? error
+        : "Something went wrong.";
+  
   return (
     <main
       role="alert"
@@ -10,7 +22,7 @@ export function ErrorComponent({ error }) {
       <header>
         <h2 className="font-bold text-lg">🚫 Error</h2>
       </header>
-      <p>{error.message || "Something went wrong."}</p>
+      <p>{message || "Something went wrong."}</p>
       <footer className="mt-4">
         <Link to="/" className="btn btn-sm btn-outline">
           Back to Todo List
